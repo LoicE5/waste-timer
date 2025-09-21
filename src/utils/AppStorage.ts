@@ -12,7 +12,7 @@ export default class AppStorage {
 
   openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.databaseName, 6); // Incremented version again
+      const request = indexedDB.open(this.databaseName, 7); // Incremented version for plain number storage
       request.onupgradeneeded = (event) => {
         const database = (event.target as IDBOpenDBRequest).result;
 
@@ -21,11 +21,9 @@ export default class AppStorage {
           database.deleteObjectStore("store");
         }
 
-        // Create the new object store with timestamp as keyPath (unique)
-        database.createObjectStore("store", {
-          keyPath: "timestamp",
-        });
-        console.log("Database upgraded to version 6 with timestamp keyPath");
+        // Create the new object store without keyPath (we'll use timestamp as key directly)
+        database.createObjectStore("store");
+        console.log("Database upgraded to version 7 with plain number storage");
       };
       request.onsuccess = () => {
         console.log("Database opened successfully");
@@ -43,14 +41,13 @@ export default class AppStorage {
     console.log("Item timestamp:", item.timestamp);
     console.log("Item wasted:", item.wasted);
 
-    // Store only the wasted value as the main data, with timestamp as metadata
-    const cleanItem = {
-      wasted: item.wasted,
-      timestamp: item.timestamp,
-    };
-
-    console.log("Clean item for storage:", cleanItem);
-    console.log("Clean item wasted (key):", cleanItem.wasted);
+    // Store only the wasted value as plain number, with timestamp as key
+    console.log(
+      "Storing plain number:",
+      item.wasted,
+      "with key:",
+      item.timestamp
+    );
 
     try {
       const database = await this.openDB();
@@ -60,8 +57,8 @@ export default class AppStorage {
         const transcation = database.transaction("store", "readwrite");
         const store = transcation.objectStore("store");
 
-        console.log("Putting item into store");
-        const putRequest = store.put(cleanItem);
+        console.log("Putting plain number into store");
+        const putRequest = store.put(item.wasted, item.timestamp);
 
         putRequest.onsuccess = () => {
           console.log("Item stored successfully");
@@ -93,9 +90,31 @@ export default class AppStorage {
     const database = await this.openDB();
     return await new Promise<StorageItem[]>((resolve, reject) => {
       const transcation = database.transaction("store", "readonly");
-      const req = transcation.objectStore("store").getAll();
-      req.onsuccess = () => resolve(req.result as StorageItem[]);
-      req.onerror = () => reject(req.error);
+      const store = transcation.objectStore("store");
+
+      // Get all keys (timestamps) and values (wasted numbers)
+      const keysRequest = store.getAllKeys();
+      const valuesRequest = store.getAll();
+
+      Promise.all([
+        new Promise<number[]>((res, rej) => {
+          keysRequest.onsuccess = () => res(keysRequest.result as number[]);
+          keysRequest.onerror = () => rej(keysRequest.error);
+        }),
+        new Promise<number[]>((res, rej) => {
+          valuesRequest.onsuccess = () => res(valuesRequest.result as number[]);
+          valuesRequest.onerror = () => rej(valuesRequest.error);
+        }),
+      ])
+        .then(([keys, values]) => {
+          // Reconstruct StorageItem objects from keys and values
+          const items: StorageItem[] = keys.map((timestamp, index) => ({
+            timestamp,
+            wasted: values[index],
+          }));
+          resolve(items);
+        })
+        .catch(reject);
     });
   }
 

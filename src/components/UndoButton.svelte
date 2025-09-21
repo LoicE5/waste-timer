@@ -10,9 +10,19 @@
     const delayUntilHidden = 5000
     let visibility = $state('hidden')
     let visibilityTimeout = 0
+    let hasUserInteracted = $state(false) // Track if user has clicked main button in this session
+    let initialHistoryLength = $state(0) // Store initial history length on mount
+
+    // Set initial history length on mount
+    $effect(() => {
+        if (timeWastedHistory.length > 0 && initialHistoryLength === 0) {
+            initialHistoryLength = timeWastedHistory.length
+        }
+    })
 
     $effect(()=> {
-        if(timeWasted > 0) {
+        // Only show undo button if user has interacted AND there's time wasted
+        if(timeWasted > 0 && hasUserInteracted) {
             setVisibility(true)
 
             if(visibilityTimeout > 0)
@@ -22,21 +32,23 @@
         }
     })
 
+    // Watch for changes in timeWastedHistory to detect user interaction
+    $effect(() => {
+        // If history length increased from initial, user must have clicked the main button
+        if(timeWastedHistory.length > initialHistoryLength) {
+            hasUserInteracted = true
+        }
+    })
+
     function setVisibility(status: boolean): void {
         visibility = status ? 'visible' : 'hidden'
     }
 
     function handleClick(): void {
-        const lastTimeWasted = timeWastedHistory.at(-1).wasted
-        if(timeWasted > lastTimeWasted)
-            timeWasted -= lastTimeWasted
-        else if(timeWasted > 0)
-            timeWasted = 0
         setVisibility(false)
         clearTimeout(visibilityTimeout)
-        timeWastedHistory.pop()
         
-        // Force immediate sync to database
+        // Let the page handle the undo logic
         onUndo()
     }
 </script>
