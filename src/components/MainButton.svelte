@@ -1,6 +1,7 @@
 <script lang="ts">
     import { randomEmoji } from "../utils/emojis"
     import { randomInt } from "../utils/functions"
+    import { timeWasteService } from "../services/TimeWasteService"
 
     let rotation: number = $state(0)
     const messages: string[] = $state([])
@@ -12,11 +13,11 @@
     function handleClick(): void {
         rotate()
         messages.push(`${randomEmoji()} Five minutes away...`)
+        
+        // Use the service method to ensure proper timestamp handling
+        const newItem = timeWasteService.addTimeWaste(5)
         timeWasted += 5
-        timeWastedHistory.push({
-            timestamp: Date.now(), 
-            wasted: 5
-        })
+        timeWastedHistory.push(newItem)
     }
 
     function rotate(): void {

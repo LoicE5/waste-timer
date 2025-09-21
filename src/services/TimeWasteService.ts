@@ -12,6 +12,17 @@ export class TimeWasteService {
   }
 
   /**
+   * Check if a timestamp is from today (since midnight)
+   */
+  private isFromToday(timestamp: number): boolean {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayMidnight = today.getTime();
+
+    return timestamp >= todayMidnight;
+  }
+
+  /**
    * Initialize the service by loading data from storage
    */
   async initialize(): Promise<{
@@ -20,7 +31,11 @@ export class TimeWasteService {
   }> {
     try {
       const storedItems = await this.storage.getAllItems();
-      const timeWasted = storedItems.reduce(
+      // Filter to only include entries from today
+      const todayItems = storedItems.filter((item) =>
+        this.isFromToday(item.timestamp)
+      );
+      const timeWasted = todayItems.reduce(
         (total, item) => total + item.wasted,
         0
       );
@@ -28,7 +43,7 @@ export class TimeWasteService {
 
       return {
         timeWasted,
-        timeWastedHistory: storedItems,
+        timeWastedHistory: todayItems,
       };
     } catch (error) {
       console.error("Failed to load from storage:", error);
@@ -88,6 +103,32 @@ export class TimeWasteService {
     await this.performSync(history);
   }
 
+  /**
+   * Get the total count of stored items in IndexedDB
+   */
+  async getTotalStoredItemsCount(): Promise<number> {
+    try {
+      const storedItems = await this.storage.getAllItems();
+      return storedItems.length;
+    } catch (error) {
+      console.error("Failed to get stored items count:", error);
+      return 0;
+    }
+  }
+
+  /**
+   * Clear all data from IndexedDB storage
+   */
+  async clearAllStorage(): Promise<void> {
+    try {
+      await this.storage.clearAllStorage();
+      console.info("All storage data cleared successfully");
+    } catch (error) {
+      console.error("Failed to clear storage:", error);
+      throw error;
+    }
+  }
+
   private debouncedSync(history: StorageItem[]): void {
     if (this.syncTimeout) {
       clearTimeout(this.syncTimeout);
@@ -106,13 +147,17 @@ export class TimeWasteService {
     this.isSyncing = true;
     try {
       const storedItems = await this.storage.getAllItems();
+      // Filter stored items to only include today's entries for comparison
+      const todayStoredItems = storedItems.filter((item) =>
+        this.isFromToday(item.timestamp)
+      );
 
       // Create composite keys for comparison
       const historyKeys = new Set(
         history.map((item) => `${item.timestamp}-${item.wasted}`)
       );
       const storedKeys = new Set(
-        storedItems.map((item) => `${item.timestamp}-${item.wasted}`)
+        todayStoredItems.map((item) => `${item.timestamp}-${item.wasted}`)
       );
 
       const operations: Promise<void>[] = [];
@@ -125,8 +170,8 @@ export class TimeWasteService {
         }
       }
 
-      // Remove items from storage that are no longer in history
-      for (const item of storedItems) {
+      // Remove items from storage that are no longer in history (only today's items)
+      for (const item of todayStoredItems) {
         const itemKey = `${item.timestamp}-${item.wasted}`;
         if (!historyKeys.has(itemKey)) {
           operations.push(this.storage.deleteItem(item.timestamp));

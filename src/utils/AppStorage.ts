@@ -151,4 +151,33 @@ export default class AppStorage {
       request.onerror = () => reject(request.error);
     });
   }
+
+  async clearAllStorage(): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("store", "readwrite");
+      const store = tx.objectStore("store");
+      const clearRequest = store.clear();
+
+      clearRequest.onsuccess = () => {
+        console.info("All storage data cleared successfully");
+        resolve();
+      };
+
+      clearRequest.onerror = () => {
+        console.error("Failed to clear storage:", clearRequest.error);
+        reject(clearRequest.error);
+      };
+
+      tx.oncomplete = () => {
+        console.info("Clear transaction completed");
+        resolve();
+      };
+
+      tx.onerror = () => {
+        console.error("Clear transaction failed:", tx.error);
+        reject(tx.error);
+      };
+    });
+  }
 }
