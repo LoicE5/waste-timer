@@ -1,12 +1,28 @@
 <script lang="ts">
     import backarrow from '$lib/assets/back-arrow.svg'
-    let {timeWasted = $bindable()} = $props()
-    let visibility = $state('hidden')
+
+    let {
+        timeWasted = $bindable(),
+        timeWastedHistory = $bindable(),
+        onUndo = () => {}
+    } = $props()
+
     const delayUntilHidden = 5000
+    let visibility = $state('hidden')
     let visibilityTimeout = 0
+    let hasUserInteracted = $state(false) // Track if user has clicked main button in this session
+    let initialHistoryLength = $state(0) // Store initial history length on mount
+
+    // Set initial history length on mount
+    $effect(() => {
+        if (timeWastedHistory.length > 0 && initialHistoryLength === 0) {
+            initialHistoryLength = timeWastedHistory.length
+        }
+    })
 
     $effect(()=> {
-        if(timeWasted > 0) {
+        // Only show undo button if user has interacted AND there's time wasted
+        if(timeWasted > 0 && hasUserInteracted) {
             setVisibility(true)
 
             if(visibilityTimeout > 0)
@@ -16,17 +32,24 @@
         }
     })
 
+    // Watch for changes in timeWastedHistory to detect user interaction
+    $effect(() => {
+        // If history length increased from initial, user must have clicked the main button
+        if(timeWastedHistory.length > initialHistoryLength) {
+            hasUserInteracted = true
+        }
+    })
+
     function setVisibility(status: boolean): void {
         visibility = status ? 'visible' : 'hidden'
     }
 
     function handleClick(): void {
-        if(timeWasted >= 5)
-            timeWasted -= 5
-        else if(timeWasted > 0)
-            timeWasted = 0
         setVisibility(false)
         clearTimeout(visibilityTimeout)
+        
+        // Let the page handle the undo logic
+        onUndo()
     }
 </script>
 
@@ -79,7 +102,7 @@
     }
 </style>
 
-<button onclick={handleClick} style="visibility: {visibility};">
+<button onclick={handleClick} style="visibility: {visibility}">
     <div class="blinking-dot"></div>
     <img src={backarrow} alt="undo action"/>
 </button>

@@ -1,38 +1,72 @@
-# sv
+# Waste Timer
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A simple, elegant web app to track time wasted at work due to technical friction and interruptions.
 
-## Creating a project
+## What is Waste Timer?
 
-If you're seeing this, you've probably already done this step. Congrats!
+Ever been frustrated by slow software, mandatory updates, system crashes, or other technical interruptions that eat into your productive work time? Waste Timer helps you quantify and track these productivity killers.
 
-```sh
-# create a new project in the current directory
-npx sv create
+Simply press the button whenever you encounter:
 
-# create a new project in my-app
-npx sv create my-app
-```
+- 🐌 Laggy software that makes you wait
+- 🐌 Mandatory system updates
+- 🐌 Application crashes or freezes
+- ⏳ Slow network connections
+- 🔧 IT maintenance windows
+- 📱 Unnecessary meetings or interruptions
+- 🎯 Any other work-related time wasters
 
-## Developing
+## Features
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- **One-click tracking**: Press the big button to log wasted time
+- **Undo functionality**: Remove the last entry if you made a mistake
+- **Persistent storage**: Your data is saved locally using IndexedDB
+- **Clean interface**: Minimal, distraction-free design
+- **Mobile-friendly**: Works great on desktop and mobile devices
 
-```sh
+## How to Use
+
+1. **Start tracking**: Click the main button whenever you waste time
+2. **View total**: See your cumulative wasted time at the top
+3. **Undo mistakes**: Use the undo button to remove the last entry
+4. **Track patterns**: Monitor your data to identify recurring issues
+
+## Development
+
+Built with modern web technologies:
+
+- **SvelteKit** - Fast, reactive frontend framework
+- **TypeScript** - Type-safe development
+- **IndexedDB** - Local data persistence
+- **Vite** - Lightning-fast build tool
+
+### Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
+# Build for production
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+## Why Track Wasted Time?
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Understanding where your time goes is the first step to improving productivity. By tracking technical friction, you can:
+
+- **Identify patterns** in system issues
+- **Justify IT improvements** with concrete data
+- **Optimize your workflow** around known bottlenecks
+- **Advocate for better tools** with evidence
+- **Measure the impact** of technical debt
+
+## Privacy
+
+All data is stored locally in your browser. Nothing is sent to external servers - your time tracking data stays private and secure.
+
+---
+
+_Stop letting technical friction eat your productivity. Start tracking it._
