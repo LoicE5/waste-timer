@@ -1,8 +1,14 @@
 <script lang="ts">
     import backarrow from '$lib/assets/back-arrow.svg'
-    let {timeWasted = $bindable()} = $props()
-    let visibility = $state('hidden')
+
+    let {
+        timeWasted = $bindable(),
+        timeWastedHistory = $bindable(),
+        onUndo = () => {}
+    } = $props()
+
     const delayUntilHidden = 5000
+    let visibility = $state('hidden')
     let visibilityTimeout = 0
 
     $effect(()=> {
@@ -21,12 +27,17 @@
     }
 
     function handleClick(): void {
-        if(timeWasted >= 5)
-            timeWasted -= 5
+        const lastTimeWasted = timeWastedHistory.at(-1).wasted
+        if(timeWasted > lastTimeWasted)
+            timeWasted -= lastTimeWasted
         else if(timeWasted > 0)
             timeWasted = 0
         setVisibility(false)
         clearTimeout(visibilityTimeout)
+        timeWastedHistory.pop()
+        
+        // Force immediate sync to database
+        onUndo()
     }
 </script>
 

@@ -4,12 +4,19 @@
 
     let rotation: number = $state(0)
     const messages: string[] = $state([])
-    let {timeWasted = $bindable()} = $props()
+    let {
+        timeWasted = $bindable(),
+        timeWastedHistory = $bindable()
+    } = $props()
 
     function handleClick(): void {
         rotate();
         messages.push(`${randomEmoji()} Five minutes away...`)
         timeWasted += 5
+        timeWastedHistory.push({
+            timestamp: Date.now(), 
+            wasted: 5
+        })
     }
 
     function rotate(): void {
