@@ -1,10 +1,23 @@
 <script lang="ts">
-    let { isVisible = $bindable() } = $props()
+    import { timeWasteService } from "../services/TimeWasteService"
     
-    function handleClick() {
-        // Emit a custom event that the parent can listen to
-        const event = new CustomEvent('clearStorage');
-        document.dispatchEvent(event);
+    let { isVisible = $bindable(), onStorageCleared } = $props()
+    
+    async function handleClick() {
+        const confirmed = confirm("Are you sure you want to clear all stored data? This action cannot be undone.")
+        if (confirmed) {
+            try {
+                await timeWasteService.clearAllStorage()
+                // Hide the warning after successful clear
+                isVisible = false
+                // Notify parent component to reset its state
+                onStorageCleared?.()
+                console.info("Storage cleared successfully")
+            } catch (error) {
+                console.error("Failed to clear storage:", error)
+                alert("Failed to clear storage. Please try again.")
+            }
+        }
     }
 </script>
 

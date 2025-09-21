@@ -19,21 +19,14 @@
         }
     })
 
-    // Listen for clear storage event
-    $effect(() => {
-        const handleClearStorage = () => {
-            const confirmed = confirm("Are you sure you want to clear all stored data? This action cannot be undone.")
-            if (confirmed) {
-                clearAllStorage()
-            }
-        }
-
-        document.addEventListener('clearStorage', handleClearStorage)
-        
-        return () => {
-            document.removeEventListener('clearStorage', handleClearStorage)
-        }
-    })
+    // Handle storage cleared callback
+    function handleStorageCleared() {
+        // Reset the local state when storage is cleared
+        timeWasted = 0
+        timeWastedHistory = []
+        showStorageWarning = false
+        console.info("App state reset after storage clear")
+    }
 
     // Auto-sync to storage when history changes
     $effect(() => {
@@ -71,19 +64,6 @@
         timeWasteService.forceSync(timeWastedHistory)
     }
 
-    async function clearAllStorage() {
-        try {
-            await timeWasteService.clearAllStorage()
-            // Reset the local state
-            timeWasted = 0
-            timeWastedHistory = []
-            showStorageWarning = false
-            console.info("Storage cleared and state reset")
-        } catch (error) {
-            console.error("Failed to clear storage:", error)
-            alert("Failed to clear storage. Please try again.")
-        }
-    }
 </script>
 
 <style lang="scss">
@@ -124,4 +104,4 @@
     onUndo={removeLastTimeWaste}
 />
 
-<StorageWarning bind:isVisible={showStorageWarning} />
+<StorageWarning bind:isVisible={showStorageWarning} onStorageCleared={handleStorageCleared} />
