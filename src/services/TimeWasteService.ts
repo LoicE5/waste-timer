@@ -135,7 +135,7 @@ export class TimeWasteService {
 
       if (operations.length > 0) {
         await Promise.all(operations);
-        console.log(`Synced ${operations.length} operations to storage`);
+        console.info(`Synced ${operations.length} operations to storage`);
       }
     } catch (error) {
       console.error("Failed to sync history with storage:", error);

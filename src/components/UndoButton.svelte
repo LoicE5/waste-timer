@@ -102,7 +102,7 @@
     }
 </style>
 
-<button onclick={handleClick} style="visibility: {visibility};">
+<button onclick={handleClick} style="visibility: {visibility}">
     <div class="blinking-dot"></div>
     <img src={backarrow} alt="undo action"/>
 </button>

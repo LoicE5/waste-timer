@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { randomEmoji } from "../utils/emojis";
-    import { randomInt } from "../utils/functions";
+    import { randomEmoji } from "../utils/emojis"
+    import { randomInt } from "../utils/functions"
 
     let rotation: number = $state(0)
     const messages: string[] = $state([])
@@ -10,7 +10,7 @@
     } = $props()
 
     function handleClick(): void {
-        rotate();
+        rotate()
         messages.push(`${randomEmoji()} Five minutes away...`)
         timeWasted += 5
         timeWastedHistory.push({
@@ -20,7 +20,7 @@
     }
 
     function rotate(): void {
-        rotation += 360;
+        rotation += 360
     }
 </script>
 
@@ -83,5 +83,5 @@
 <button style="transform: rotate({rotation}deg)" onclick={handleClick}><div>Just lost time...</div></button>
 
 {#each messages as message}
-    <div class="message" style="left:{randomInt(40,60)}vw;">{message}</div>
+    <div class="message" style="left:{randomInt(40,60)}vw">{message}</div>
 {/each}

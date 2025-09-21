@@ -23,10 +23,12 @@ export default class AppStorage {
 
         // Create the new object store without keyPath (we'll use timestamp as key directly)
         database.createObjectStore("store");
-        console.log("Database upgraded to version 7 with plain number storage");
+        console.info(
+          "Database upgraded to version 7 with plain number storage"
+        );
       };
       request.onsuccess = () => {
-        console.log("Database opened successfully");
+        console.info("Database opened successfully");
         resolve(request.result);
       };
       request.onerror = () => {
@@ -37,12 +39,12 @@ export default class AppStorage {
   }
 
   async upsertItem(item: StorageItem): Promise<void> {
-    console.log("Attempting to store item:", item);
-    console.log("Item timestamp:", item.timestamp);
-    console.log("Item wasted:", item.wasted);
+    console.info("Attempting to store item:", item);
+    console.info("Item timestamp:", item.timestamp);
+    console.info("Item wasted:", item.wasted);
 
     // Store only the wasted value as plain number, with timestamp as key
-    console.log(
+    console.info(
       "Storing plain number:",
       item.wasted,
       "with key:",
@@ -51,17 +53,17 @@ export default class AppStorage {
 
     try {
       const database = await this.openDB();
-      console.log("Database opened, creating transaction");
+      console.info("Database opened, creating transaction");
 
       return await new Promise<void>((resolve, reject) => {
         const transcation = database.transaction("store", "readwrite");
         const store = transcation.objectStore("store");
 
-        console.log("Putting plain number into store");
+        console.info("Putting plain number into store");
         const putRequest = store.put(item.wasted, item.timestamp);
 
         putRequest.onsuccess = () => {
-          console.log("Item stored successfully");
+          console.info("Item stored successfully");
           resolve();
         };
 
@@ -71,7 +73,7 @@ export default class AppStorage {
         };
 
         transcation.oncomplete = () => {
-          console.log("Transaction completed");
+          console.info("Transaction completed");
           resolve();
         };
 
