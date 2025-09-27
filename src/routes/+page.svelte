@@ -2,6 +2,7 @@
     import MainButton from "../components/MainButton.svelte"
     import UndoButton from "../components/UndoButton.svelte"
     import StorageWarning from "../components/StorageWarning.svelte"
+    import StatsButton from "../components/StatsButton.svelte"
     import { formatTime } from "../utils/functions"
     import { timeWasteService } from "../services/TimeWasteService"
     import type { StorageItem } from "../utils/AppStorage"
@@ -105,3 +106,7 @@
 />
 
 <StorageWarning bind:isVisible={showStorageWarning} onStorageCleared={handleStorageCleared} />
+
+{#if timeWastedHistory.length > 0}
+    <StatsButton bind:timeWastedHistory={timeWastedHistory} />
+{/if}
