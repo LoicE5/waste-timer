@@ -20,7 +20,7 @@ const config = {
     },
     prerender: {
       handleHttpError: "warn",
-      entries: ["*"],
+      entries: ["/", "/stats", "/stats/raw"],
     },
   },
 };

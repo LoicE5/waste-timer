@@ -17,6 +17,12 @@
       loading = true;
       error = '';
       
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        loading = false;
+        return;
+      }
+      
       // Get URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const rate = urlParams.get('rate');
@@ -42,6 +48,8 @@
    */
   async function downloadStats() {
     try {
+      if (typeof window === 'undefined') return;
+      
       const urlParams = new URLSearchParams(window.location.search);
       const rate = urlParams.get('rate');
       const currency = urlParams.get('currency');
@@ -59,6 +67,8 @@
    */
   async function copyToClipboard() {
     try {
+      if (typeof window === 'undefined' || !navigator.clipboard) return;
+      
       await navigator.clipboard.writeText(jsonString);
       alert('JSON copied to clipboard!');
     } catch (err) {

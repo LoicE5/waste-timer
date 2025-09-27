@@ -14,6 +14,12 @@
       loading = true;
       error = '';
       
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        loading = false;
+        return;
+      }
+      
       // Get URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const rate = urlParams.get('rate');
@@ -39,7 +45,9 @@
     } catch (err) {
       console.error('Error generating raw stats:', err);
       error = 'Failed to generate statistics';
-      document.body.innerHTML = `<pre style="margin: 20px; padding: 20px; font-family: monospace; color: red;">Error: ${error}</pre>`;
+      if (typeof window !== 'undefined') {
+        document.body.innerHTML = `<pre style="margin: 20px; padding: 20px; font-family: monospace; color: red;">Error: ${error}</pre>`;
+      }
     } finally {
       loading = false;
     }
