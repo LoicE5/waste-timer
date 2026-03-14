@@ -98,20 +98,20 @@
 {:else}
   <div style="padding: 20px;">
     <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-      <button 
-        on:click={() => showRawJson = !showRawJson}
+      <button
+        onclick={() => showRawJson = !showRawJson}
         style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
       >
         {showRawJson ? 'Hide' : 'Show'} Raw JSON
       </button>
-      <button 
-        on:click={copyToClipboard}
+      <button
+        onclick={copyToClipboard}
         style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;"
       >
         Copy JSON
       </button>
-      <button 
-        on:click={downloadStats}
+      <button
+        onclick={downloadStats}
         style="padding: 8px 16px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;"
       >
         Download JSON

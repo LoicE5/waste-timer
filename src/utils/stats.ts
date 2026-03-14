@@ -129,13 +129,3 @@ export async function generateStats(
   return stats;
 }
 
-/**
- * Generate stats JSON string
- */
-export async function generateStatsJSON(
-  rate?: number,
-  currency?: string
-): Promise<string> {
-  const stats = await generateStats(rate, currency);
-  return JSON.stringify(stats, null, 2);
-}
