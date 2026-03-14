@@ -1,9 +1,15 @@
-*,*::before, *::after {
+*, *::before, *::after {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 * {
-    font-family: consolas;
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
